@@ -118,21 +118,20 @@ task_t task_submit(struct task* caller, uthread_routine entry, void* argument);
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
-#include <stdint.h>
 struct task;
 void sched_block_on_fd(struct task* task, int fd, uint32_t events);
 
-#define IO_EVENT_READ  0x01
+#define IO_EVENT_READ 0x01
 #define IO_EVENT_WRITE 0x02
-
 
 static inline void coro_set_nonblock(int fd) {
   int flags = fcntl(fd, F_GETFL, 0);
-  if (flags < 0) return;
+  if (flags < 0)
+    return;
   if ((flags & O_NONBLOCK) == 0) {
     (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
   }
@@ -142,8 +141,10 @@ static inline ssize_t coro_read(struct task* self, int fd, void* buf, size_t n) 
   coro_set_nonblock(fd);
   for (;;) {
     ssize_t r = read(fd, buf, n);
-    if (r >= 0) return r;
-    if (errno == EINTR) continue;
+    if (r >= 0)
+      return r;
+    if (errno == EINTR)
+      continue;
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       sched_block_on_fd(self, fd, IO_EVENT_READ);
       continue;
@@ -163,7 +164,8 @@ static inline ssize_t coro_write(struct task* self, int fd, const void* buf, siz
       left -= (size_t)r;
       continue;
     }
-    if (r < 0 && errno == EINTR) continue;
+    if (r < 0 && errno == EINTR)
+      continue;
     if (r < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
       sched_block_on_fd(self, fd, IO_EVENT_WRITE);
       continue;
@@ -183,7 +185,8 @@ static inline int coro_accept(
       coro_set_nonblock(cfd);
       return cfd;
     }
-    if (errno == EINTR) continue;
+    if (errno == EINTR)
+      continue;
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       sched_block_on_fd(self, listen_fd, IO_EVENT_READ);
       continue;

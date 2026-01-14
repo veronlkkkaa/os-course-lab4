@@ -2,12 +2,12 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <stdatomic.h>
 
 #define SERVER_PORT 8081
 #define BACKLOG 128
@@ -29,8 +29,8 @@ static int parse_hello_path(const char* path, char* name_out, size_t name_size) 
   const char* name_end = name_start;
 
   // Найти конец имени (до пробела, ? или конца строки)
-  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' &&
-         *name_end != '\n') {
+  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' && *name_end != '\n'
+  ) {
     name_end++;
   }
 
@@ -106,14 +106,18 @@ static void* handle_client(void* arg) {
     char json_body[256];
     snprintf(json_body, sizeof(json_body), "{\"message\":\"%s\"}", name);
 
-    snprintf(response, sizeof(response),
-             "HTTP/1.1 200 OK\r\n"
-             "Content-Type: application/json\r\n"
-             "Content-Length: %zu\r\n"
-             "Connection: close\r\n"
-             "\r\n"
-             "%s",
-             strlen(json_body), json_body);
+    snprintf(
+        response,
+        sizeof(response),
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: %zu\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "%s",
+        strlen(json_body),
+        json_body
+    );
 
     result = write(client_fd, response, strlen(response));
     (void)result;  // Ignore write errors
@@ -209,4 +213,3 @@ int main() {
 
   return 0;
 }
-

@@ -27,8 +27,8 @@ static int parse_hello_path(const char* path, char* name_out, size_t name_size) 
   const char* name_end = name_start;
 
   // Найти конец имени (до пробела, ? или конца строки)
-  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' &&
-         *name_end != '\n') {
+  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' && *name_end != '\n'
+  ) {
     name_end++;
   }
 
@@ -101,14 +101,18 @@ TASK_DEFINE(handle_client, int, client_fd_ptr) {
     char json_body[256];
     snprintf(json_body, sizeof(json_body), "{\"message\":\"%s\"}", name);
 
-    snprintf(response, sizeof(response),
-             "HTTP/1.1 200 OK\r\n"
-             "Content-Type: application/json\r\n"
-             "Content-Length: %zu\r\n"
-             "Connection: close\r\n"
-             "\r\n"
-             "%s",
-             strlen(json_body), json_body);
+    snprintf(
+        response,
+        sizeof(response),
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: %zu\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "%s",
+        strlen(json_body),
+        json_body
+    );
 
     coro_write(__self, client_fd, response, strlen(response));
   } else {
@@ -167,11 +171,11 @@ TASK_DEFINE(http_server, void, unused) {
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    int client_fd =
-        coro_accept(__self, listen_fd, (struct sockaddr*)&client_addr, &client_len);
+    int client_fd = coro_accept(__self, listen_fd, (struct sockaddr*)&client_addr, &client_len);
 
     if (client_fd < 0) {
-      if (errno == EINTR) continue;
+      if (errno == EINTR)
+        continue;
       perror("accept");
       continue;
     }

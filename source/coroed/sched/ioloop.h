@@ -21,4 +21,3 @@ int ioloop_poll(int timeout_ms);
 
 // Unregister fd from I/O loop
 void ioloop_unregister(int fd);
-
