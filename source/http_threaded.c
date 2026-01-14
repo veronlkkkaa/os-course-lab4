@@ -70,6 +70,7 @@ static int extract_path(const char* request, char* path_out, size_t path_size) {
 // Обработка клиентского соединения в отдельном потоке
 static void* handle_client(void* arg) {
   int client_fd = (int)(long)arg;
+  ssize_t result;  // For write() return values
 
   char buffer[BUFFER_SIZE];
   ssize_t n = read(client_fd, buffer, sizeof(buffer) - 1);
@@ -91,7 +92,7 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Bad Request";
-    ssize_t result = write(client_fd, error_response, strlen(error_response));
+    result = write(client_fd, error_response, strlen(error_response));
     (void)result;  // Ignore write errors in this simple server
     close(client_fd);
     atomic_fetch_add(&requests_handled, 1);
