@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Сборка и тесты
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    command: ./build/bin/app
+    
+  # HTTP сервер на корутинах
+  http-coroed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+    command: ./build/bin/http_coroed
+    
+  # HTTP сервер на потоках
+  http-threaded:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    ports:
+      - "8081:8081"
+    command: ./build/bin/http_threaded
+    
+  # Бенчмарк
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    command: bash -c "chmod +x /app/benchmark.sh && /app/benchmark.sh"
