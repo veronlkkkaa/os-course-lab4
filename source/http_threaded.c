@@ -91,7 +91,7 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Bad Request";
-    write(client_fd, error_response, strlen(error_response));
+    (void)write(client_fd, error_response, strlen(error_response));
     close(client_fd);
     atomic_fetch_add(&requests_handled, 1);
     return NULL;
@@ -113,7 +113,7 @@ static void* handle_client(void* arg) {
              "%s",
              strlen(json_body), json_body);
 
-    write(client_fd, response, strlen(response));
+    (void)write(client_fd, response, strlen(response));
   } else {
     // Неизвестный путь
     const char* error_response =
@@ -123,7 +123,7 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Not Found";
-    write(client_fd, error_response, strlen(error_response));
+    (void)write(client_fd, error_response, strlen(error_response));
   }
 
   close(client_fd);
