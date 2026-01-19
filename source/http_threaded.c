@@ -70,6 +70,7 @@ static int extract_path(const char* request, char* path_out, size_t path_size) {
 // Обработка клиентского соединения в отдельном потоке
 static void* handle_client(void* arg) {
   int client_fd = (int)(long)arg;
+  ssize_t write_result;
 
   char buffer[BUFFER_SIZE];
   ssize_t n = read(client_fd, buffer, sizeof(buffer) - 1);
@@ -91,7 +92,8 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Bad Request";
-    (void)write(client_fd, error_response, strlen(error_response));
+    write_result = write(client_fd, error_response, strlen(error_response));
+    (void)write_result;
     close(client_fd);
     atomic_fetch_add(&requests_handled, 1);
     return NULL;
@@ -113,7 +115,8 @@ static void* handle_client(void* arg) {
              "%s",
              strlen(json_body), json_body);
 
-    (void)write(client_fd, response, strlen(response));
+    write_result = write(client_fd, response, strlen(response));
+    (void)write_result;
   } else {
     // Неизвестный путь
     const char* error_response =
@@ -123,7 +126,8 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Not Found";
-    (void)write(client_fd, error_response, strlen(error_response));
+    write_result = write(client_fd, error_response, strlen(error_response));
+    (void)write_result;
   }
 
   close(client_fd);
