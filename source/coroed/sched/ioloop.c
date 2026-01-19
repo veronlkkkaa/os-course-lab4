@@ -69,8 +69,7 @@ void ioloop_register(int fd, uint32_t events, struct task* task) {
 }
 
 void ioloop_unregister(int fd) {
-  if (fd < 0 || fd >= IO_FD_LIMIT)
-    return;
+  if (fd < 0 || fd >= IO_FD_LIMIT) return;
 
   spinlock_lock(&io_lock);
   io_waiting[fd] = NULL;
@@ -86,8 +85,7 @@ int ioloop_poll(int timeout_ms) {
 
   int n = epoll_wait(epfd, events, IO_MAX_EVENTS, timeout_ms);
   if (n < 0) {
-    if (errno == EINTR)
-      return 0;
+    if (errno == EINTR) return 0;
     perror("epoll_wait");
     return 0;
   }
@@ -96,12 +94,10 @@ int ioloop_poll(int timeout_ms) {
   spinlock_lock(&io_lock);
   for (int i = 0; i < n; ++i) {
     int fd = events[i].data.fd;
-    if (fd < 0 || fd >= IO_FD_LIMIT)
-      continue;
+    if (fd < 0 || fd >= IO_FD_LIMIT) continue;
 
     struct task* t = io_waiting[fd];
-    if (!t)
-      continue;
+    if (!t) continue;
 
     // Снимаем ожидание (one-shot)
     io_waiting[fd] = NULL;

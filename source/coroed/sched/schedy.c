@@ -152,8 +152,7 @@ static struct task* ready_queue_pop(struct ready_queue* q) {
   struct task* t = q->head;
   if (t) {
     q->head = t->next_ready;
-    if (!q->head)
-      q->tail = NULL;
+    if (!q->head) q->tail = NULL;
     t->next_ready = NULL;
   }
   spinlock_unlock(&q->lock);
@@ -252,7 +251,7 @@ int sched_loop(void* argument) {
     spinlock_lock(&alive_lock);
     size_t alive = alive_count;
     spinlock_unlock(&alive_lock);
-
+    
     if (alive == 0) {
       break;
     }
@@ -279,8 +278,7 @@ int sched_loop(void* argument) {
 struct task* sched_acquire_next() {
   for (size_t attempt = 0; attempt < SCHED_NEXT_MAX_ATTEMPTS; ++attempt) {
     struct task* task = ready_queue_pop(&ready_q);
-    if (task == NULL)
-      return NULL;
+    if (task == NULL) return NULL;
 
     if (!spinlock_try_lock(&task->lock)) {
       ready_queue_push(&ready_q, task);
@@ -305,7 +303,7 @@ void sched_release(struct task* task) {
     uthread_reset(task->thread);
     task->state = UTHREAD_ZOMBIE;
     spinlock_unlock(&task->lock);
-
+    
     spinlock_lock(&alive_lock);
     alive_count--;
     spinlock_unlock(&alive_lock);
@@ -370,12 +368,12 @@ task_t sched_try_submit(void (*entry)(), void* argument) {
       uthread_set_arg_0(task->thread, task);
       uthread_set_arg_1(task->thread, argument);
       task->state = UTHREAD_RUNNABLE;
-      spinlock_unlock(&task->lock);
+    spinlock_unlock(&task->lock);
 
       spinlock_lock(&alive_lock);
       alive_count++;
       spinlock_unlock(&alive_lock);
-
+      
       ready_queue_push(&ready_q, task);
       return (task_t){.task = task};
     }
@@ -402,7 +400,7 @@ void sched_block_on_fd(struct task* task, int fd, uint32_t events) {
   task->waiting_fd = fd;
   task->waiting_events = events;
   task->state = UTHREAD_BLOCKED;
-
+  
   ioloop_register(fd, events, task);
   sched_switch_to_scheduler(task);
 }

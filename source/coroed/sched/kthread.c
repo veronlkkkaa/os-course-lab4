@@ -51,7 +51,7 @@ enum kthread_status kthread_create(
   kthread->routine = routine;
   kthread->argument = argument;
   kthread->return_code = 0;
-
+  
   int code = pthread_create(&kthread->thread, NULL, kthread_wrapper, kthread);
   return code == 0 ? KTHREAD_SUCCESS : KTHREAD_FAILURE;
 }

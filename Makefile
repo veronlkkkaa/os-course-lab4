@@ -4,7 +4,7 @@ OBJ_DIR   = $(BUILD_DIR)/obj
 BIN_DIR   = $(BUILD_DIR)/bin
 
 COMPILER           ?= clang
-OPTIMIZATION_LEVEL ?= -O3
+OPTIMIZATION_LEVEL ?= -O2
 SANITIZERS         ?=
 
 CC        = $(COMPILER)

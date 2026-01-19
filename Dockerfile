@@ -1,24 +1,18 @@
-# Используем Ubuntu 22.04 как базовый образ для Linux x86-64
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM ubuntu:24.04
 
-# Установка необходимых пакетов
-RUN apt-get update && apt-get install -y \
-    gcc \
-    clang \
-    clang-format \
-    make \
-    apache2-utils \
-    netcat \
-    && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /work
 
-# Создание рабочей директории
-WORKDIR /app
+# зависимости для сборки + форматирования + bear
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential clang make git ca-certificates \
+    bear clang-format \
+ && rm -rf /var/lib/apt/lists/*
 
-# Копирование исходников
+# копируем проект внутрь образа
 COPY . .
 
-# Сборка проекта
-RUN make clean && make compile
+# сборка (и compile_commands.json если нужен)
+RUN make clean && bear -- make compile && make
 
-# По умолчанию запускаем тесты
-CMD ["./build/bin/app"]
+CMD ["bash"]

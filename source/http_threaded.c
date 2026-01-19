@@ -29,8 +29,8 @@ static int parse_hello_path(const char* path, char* name_out, size_t name_size) 
   const char* name_end = name_start;
 
   // Найти конец имени (до пробела, ? или конца строки)
-  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' && *name_end != '\n'
-  ) {
+  while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' &&
+         *name_end != '\n') {
     name_end++;
   }
 
@@ -70,7 +70,6 @@ static int extract_path(const char* request, char* path_out, size_t path_size) {
 // Обработка клиентского соединения в отдельном потоке
 static void* handle_client(void* arg) {
   int client_fd = (int)(long)arg;
-  ssize_t result;  // For write() return values
 
   char buffer[BUFFER_SIZE];
   ssize_t n = read(client_fd, buffer, sizeof(buffer) - 1);
@@ -92,8 +91,7 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Bad Request";
-    result = write(client_fd, error_response, strlen(error_response));
-    (void)result;  // Ignore write errors in this simple server
+    write(client_fd, error_response, strlen(error_response));
     close(client_fd);
     atomic_fetch_add(&requests_handled, 1);
     return NULL;
@@ -106,21 +104,16 @@ static void* handle_client(void* arg) {
     char json_body[256];
     snprintf(json_body, sizeof(json_body), "{\"message\":\"%s\"}", name);
 
-    snprintf(
-        response,
-        sizeof(response),
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: application/json\r\n"
-        "Content-Length: %zu\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        "%s",
-        strlen(json_body),
-        json_body
-    );
+    snprintf(response, sizeof(response),
+             "HTTP/1.1 200 OK\r\n"
+             "Content-Type: application/json\r\n"
+             "Content-Length: %zu\r\n"
+             "Connection: close\r\n"
+             "\r\n"
+             "%s",
+             strlen(json_body), json_body);
 
-    result = write(client_fd, response, strlen(response));
-    (void)result;  // Ignore write errors
+    write(client_fd, response, strlen(response));
   } else {
     // Неизвестный путь
     const char* error_response =
@@ -130,8 +123,7 @@ static void* handle_client(void* arg) {
         "Connection: close\r\n"
         "\r\n"
         "Not Found";
-    result = write(client_fd, error_response, strlen(error_response));
-    (void)result;  // Ignore write errors
+    write(client_fd, error_response, strlen(error_response));
   }
 
   close(client_fd);
