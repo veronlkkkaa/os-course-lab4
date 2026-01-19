@@ -30,7 +30,8 @@ static int parse_hello_path(const char* path, char* name_out, size_t name_size) 
 
   // Найти конец имени (до пробела, ? или конца строки)
   while (*name_end && *name_end != ' ' && *name_end != '?' && *name_end != '\r' &&
-         *name_end != '\n') {
+         *name_end != '\n'
+  ) {
     name_end++;
   }
 
