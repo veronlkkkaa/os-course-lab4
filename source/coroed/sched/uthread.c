@@ -80,10 +80,10 @@ void uthread_reset(struct uthread* thread) {
 
   struct switch_frame* frame = (struct switch_frame*)(thread->context);
   memset(frame, 0, sizeof(struct switch_frame));
-  
+
   uint64_t* dummy_ret = (uint64_t*)(stack_top - 8);
   *dummy_ret = 0;
-  
+
   uthread_set_entry(thread, NULL);
   uthread_set_arg_0(thread, NULL);
   uthread_set_arg_1(thread, NULL);

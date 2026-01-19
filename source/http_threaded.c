@@ -106,14 +106,18 @@ static void* handle_client(void* arg) {
     char json_body[256];
     snprintf(json_body, sizeof(json_body), "{\"message\":\"%s\"}", name);
 
-    snprintf(response, sizeof(response),
-             "HTTP/1.1 200 OK\r\n"
-             "Content-Type: application/json\r\n"
-             "Content-Length: %zu\r\n"
-             "Connection: close\r\n"
-             "\r\n"
-             "%s",
-             strlen(json_body), json_body);
+    snprintf(
+        response,
+        sizeof(response),
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Length: %zu\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "%s",
+        strlen(json_body),
+        json_body
+    );
 
     write_result = write(client_fd, response, strlen(response));
     (void)write_result;
