@@ -13,12 +13,12 @@
 - Event
 - Sleep
 
-## Build & Run
 
-Getting started.
+### Linux x64
 
 ```bash
 make clean && bear -- make compile && make
+./build/bin/app
 ```
 
 Run precommit checks locally.

@@ -21,3 +21,5 @@ __switch_threads:
 	popq %rbx
 
 	retq
+
+.section .note.GNU-stack,"",@progbits
